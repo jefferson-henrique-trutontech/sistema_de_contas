@@ -1,4 +1,4 @@
-<div id="modal">
+<div id="modal" style="display: none">
     <button onclick="fecharModal()">Fechar modal</button>
     <div id="modal_content">
         

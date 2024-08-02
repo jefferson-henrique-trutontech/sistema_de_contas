@@ -1,9 +1,11 @@
 <?php
 include 'classes/database.php';
 include 'classes/contas.php';
+include 'classes/produtos.php';
 $db = new Database();
 $con = $db ->getCon();
 $contas = new Contas($con);
+$produtos = new Produtos($con);
 ?>
 
 <!DOCTYPE html>
@@ -24,18 +26,18 @@ $contas = new Contas($con);
     </nav>
     <h2>Contas</h2>
     <ul>
+        <?php
+        foreach($contas->get_contas() as $conta):?>
+        <?php
+            $entrada = date('d/m/Y', strtotime($conta['entrada']));
+            $vencimento = date('d/m/Y', strtotime($conta['vencimento']));
+            $soma = (float) $produtos->somar_conta($conta['id_conta']);
+            $soma = number_format($soma, 2, ',', '.');
+        ?>
         <li>
-            <details>
-                <summary>Usuário 1 | Entrada: 00/00/0000 | Vencimento: 00/00/0000 | Valor: R$ 0000,00</summary>
-                <ul>
-                    <li>Produto 1 | R$ 0000,00</li>
-                    <li>Produto 2 | R$ 0000,00</li>
-                    <li>Produto 3 | R$ 0000,00</li>
-                    <li>Produto 4 | R$ 0000,00</li>
-                    <li>Produto 5 | R$ 0000,00</li>
-                </ul>
-            </details>
+                <a href="paginas/conta.php?id=<?=$conta['id_conta']?>"><?=$conta['cliente']?> | Entrada: <?=$entrada?> | Vencimento: <?=$vencimento?> | Valor: R$ <?=$soma?></a>
         </li>
+        <?php endforeach?>
     </ul>
     <button id="novaConta">Nova conta</button>
     <?php include "componentes/modal.php"?>
@@ -51,7 +53,7 @@ $contas = new Contas($con);
             var hours = ('0' + now.getHours()).slice(-2);
             var minutes = ('0' + now.getMinutes()).slice(-2);
 
-            var formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            var formattedDateTime = `${year}-${month}-${day}`;
             
             // Definir o valor do input
             document.getElementById('entrada').value = formattedDateTime;
@@ -66,7 +68,7 @@ $contas = new Contas($con);
                 <label for="nome">Nome</label>
                 <input type="text" id="nome" name="nome">
                 <label for="entrada">Entrada</label>
-                <input type="datetime-local" id="entrada" name="entrada">
+                <input type="date" id="entrada" name="entrada">
                 <label for="vencimento">Vencimento</label>
                 <input type="date" id="vencimento" name="vencimento">
             </div>
